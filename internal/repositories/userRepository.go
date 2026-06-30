@@ -106,7 +106,7 @@ func UserCreate(pool *pgxpool.Pool, name string, username string, email string, 
 	return user, nil
 }
 
-func UserUpdate(pool *pgxpool.Pool, id int, name string, username string, email string, password string) (*models.User, error) {
+func UserEdit(pool *pgxpool.Pool, id int, name string, username string, email string, password string) (*models.User, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 

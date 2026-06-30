@@ -110,7 +110,7 @@ func UserUpdate(pool *pgxpool.Pool) gin.HandlerFunc {
 			username = userBody.Username
 		}
 
-		user, err := repositories.UserUpdate(pool, existingUser.ID, name, username, existingUser.Email, existingUser.Password)
+		user, err := repositories.UserEdit(pool, existingUser.ID, name, username, existingUser.Email, existingUser.Password)
 		if err != nil {
 			config.InternalServerError(context, err.Error())
 			return
