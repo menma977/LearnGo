@@ -31,7 +31,7 @@ func UserAll(pool *pgxpool.Pool) ([]models.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	query := `SELECT id, uuid, name, username, email, created_at, updated_at, deleted_at FROM users WHERE deleted_at IS NULL order by id desc`
+	query := `SELECT * FROM users WHERE deleted_at IS NULL order by id desc`
 	rows, err := pool.Query(ctx, query)
 	if err != nil {
 		log.Fatal(err)
@@ -61,7 +61,7 @@ func UserFindById(pool *pgxpool.Pool, id int) (*models.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	query := `SELECT id, uuid, name, username, email, created_at, updated_at, deleted_at FROM users WHERE id = $1`
+	query := `SELECT * FROM users WHERE id = $1`
 	user, err := scanUser(pool.QueryRow(ctx, query, id))
 	if err != nil {
 		log.Fatal(err)
@@ -75,7 +75,7 @@ func UserFindByUuid(pool *pgxpool.Pool, id string) (*models.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	query := `SELECT id, uuid, name, username, email, created_at, updated_at, deleted_at FROM users WHERE uuid = $1`
+	query := `SELECT * FROM users WHERE uuid = $1`
 	user, err := scanUser(pool.QueryRow(ctx, query, id))
 	if err != nil {
 		log.Fatal(err)
@@ -120,6 +120,20 @@ func UserEdit(pool *pgxpool.Pool, id int, name string, username string, email st
 		password,
 		id,
 	))
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func UserRemove(pool *pgxpool.Pool, id int) (*models.User, error) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	query := `UPDATE users SET deleted_at = CURRENT_TIMESTAMP WHERE id = $1 returning id, uuid, name, username, email, created_at, updated_at, deleted_at`
+	user, err := scanUser(pool.QueryRow(ctx, query, id))
 	if err != nil {
 		log.Fatal(err)
 		return nil, err

@@ -47,6 +47,7 @@ func main() {
 	router.GET("/api/user/show/:id", controllers.UserShow(databasePool))
 	router.POST("/api/user/store", controllers.UserStore(databasePool))
 	router.PUT("/api/user/update/:id", controllers.UserUpdate(databasePool))
+	router.DELETE("/api/user/delete/:id", controllers.UserDelete(databasePool))
 
 	executionError = router.Run(":" + os.Getenv("PORT"))
 	if executionError != nil {

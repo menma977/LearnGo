@@ -121,3 +121,25 @@ func UserUpdate(pool *pgxpool.Pool) gin.HandlerFunc {
 		})
 	}
 }
+
+func UserDelete(pool *pgxpool.Pool) gin.HandlerFunc {
+	return func(context *gin.Context) {
+		id := context.Param("id")
+
+		existingUser, err := repositories.UserFindByUuid(pool, id)
+		if err != nil {
+			config.InternalServerError(context, err.Error())
+			return
+		}
+
+		user, err := repositories.UserRemove(pool, existingUser.ID)
+		if err != nil {
+			config.InternalServerError(context, err.Error())
+			return
+		}
+
+		config.Success(context, gin.H{
+			"user": user,
+		})
+	}
+}
